@@ -9,7 +9,6 @@ module.exports = function (sails) {
 
     // Run when sails loads-- be sure and call `next()`.
         initialize: function (next) {
-            console.log(sails);
           var SMTPServer = require('./lib/smtp-server').SMTPServer;
 
           var SERVER_PORT = 25;
