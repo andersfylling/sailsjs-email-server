@@ -1,15 +1,34 @@
 /**
  * smtp hook
- */
+*/
 
 module.exports = function (sails) {
+    var self = this;
+
+
+
     return {
 
-        
+        /**
+        * Default configuration
+        * @type {Object}
+        */
+        defaults: function () {
+            var obj = {
+                //server port
+
+
+
+            };
+
+            return obj;
+        },
 
     // Run when sails loads-- be sure and call `next()`.
         initialize: function (next) {
-          var SMTPServer = require('./lib/smtp-server').SMTPServer;
+        var SMTPServer = require("smtp-server").SMTPServer;
+        var MailParser = require("mailparser").MailParser;
+        var mailparser = new MailParser();
 
           var SERVER_PORT = 25;
           var SERVER_HOST = '0.0.0.0';
@@ -29,19 +48,7 @@ module.exports = function (sails) {
               banner: 'Welcome to My Awesome SMTP Server',
 
               // disable STARTTLS to allow authentication in clear text mode
-              disabledCommands: ['STARTTLS'],
-
-              // Setup authentication
-              // Allow only users with username 'testuser' and password 'testpass'
-              onAuth: function (auth, session, callback) {
-                  if (auth.username !== 'testuser' && auth.password !== 'testpass') {
-                      callback(new Error('Authentication failed'));
-                  }
-
-                  return callback(null, {
-                      user: 'userdata' // value could be an user id, or an user object etc. This value can be accessed from session.user afterwards
-                  });
-              },
+              disabledCommands: ['AUTH'],
 
               // Validate MAIL FROM envelope address. Example allows all addresses that do not start with 'deny'
               // If this method is not set, all addresses are allowed
@@ -63,8 +70,13 @@ module.exports = function (sails) {
 
               // Handle message stream
               onData: function (stream, session, callback) {
-                  stream.pipe(process.stdout);
-                  stream.on('end', callback); // accept the message once the stream is ended
+                  //stream.pipe(process.stdout);
+                  //stream.on('end', callback); // accept the message once the stream is ended
+                  mailparser.on('end', function (mail) {
+                      //save mail to mongodb
+                      callback();
+                  });
+                  stream.pipe(mailparser);
               }
           });
 
