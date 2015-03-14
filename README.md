@@ -1,4 +1,4 @@
-# sailsjs-email-server2
+# sailsjs-email-server
 
 -sailsjs application with smtp-server from npm.org as a hook.
 -Uses socket.io to communicate with connected users about new mail.
