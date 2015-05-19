@@ -6,22 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <!--STYLES-->
-    <link rel="stylesheet" href="/css/mailServer/app.css">
+    <link rel="stylesheet" href="/css/mail/app.css">
     <!--STYLES END-->
   </head>
 
-  <body>
+  <body ng-app="mail">
     
 	<!-- 
 		Header
 	-->
-	<h1>test</h1>
+	<h1>test {{1+3}}</h1>
 
 	<!--
 		Angular js view
 	-->
 
-	<div ng-view></div>
+	<ng-viewport></ng-viewport>
 
 
 	<!-- 
@@ -31,13 +31,15 @@
 
     <!--SCRIPTS-->
     <script src="//localhost/js/dependencies/sails.io.js"></script>
+    <script src="//localhost/js/dependencies/mail/sails.socket.config.js"></script>
     <script src="//localhost/js/dependencies/angular.1.4.0.min.js"></script>
-    <script src="//localhost/js/mailServer/app.js"></script>
-    <script src="//localhost/js/mailServer/controllers.js"></script>
-    <script src="//localhost/js/mailServer/directives.js"></script>
-    <script src="//localhost/js/mailServer/factories.js"></script>
-    <script src="//localhost/js/mailServer/filters.js"></script>
-    <script src="//localhost/js/mailServer/services.js"></script>
+    <script src="//localhost/js/dependencies/angular.1.4.0-route.min.js"></script>
+    <script src="//localhost/js/mail/app.js"></script>
+    <script src="//localhost/js/mail/controllers.js"></script>
+    <script src="//localhost/js/mail/directives.js"></script>
+    <script src="//localhost/js/mail/factories.js"></script>
+    <script src="//localhost/js/mail/filters.js"></script>
+    <script src="//localhost/js/mail/services.js"></script>
     <!--SCRIPTS END-->
   </body>
 </html>

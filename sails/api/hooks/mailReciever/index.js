@@ -3,90 +3,80 @@
  */
 
 module.exports = function (sails) {
-    /*
-    *   private methods, used for async series
-    */
     //check if data is acceptable
-    function handleResponse(data, cb) {
-        //respondtypes to haraka server
-        var response = {
-            good: 1,
-            bad: 0
-        };
-
+    function validJSON(data) {
         //check if data is able to json stringify and parse
         //else return bad repsonse
         try {
             var handled = JSON.parse(data);
         } catch (e) {
-            return response.bad;
+            return false;
         };
 
         //all ok
-        return response.good;
+        return true;
     }
 
-    //check if legit connection
-    function security(socket, cb) {
-        var async = require("async");
+    //check port and ip, should all be internal!
+    function senderIsValid(socket) {
+        var validSenders = {
+            remoteAddress: [
+                "127.0.0.1",
+                "::1",
+                "localhost"
+            ],
+            remotePort: [
+                "25",
+                "2525"
+            ],
+            token: "gGfnmd583hgIfiDISIAPWM423Mmn" //hardcoded!
 
-        async.parallel({
-            ip: function (callback) {
-                if (socket.remoteAddress == "127.0.0.1") callback(null, 1);
-            },
-            two: function (callback) {
-                if (socket.remotePort == "25") callback(null, 1);
-            }
-        },
-        function (err, results) {
-            //if any error, report it
-            for (var i = results.length; i >= 0; i--) {
-                if (results[i] !== 1) cb(null, "security error at: " + i);
-            }
+        };
 
-            //if no error then report back everything is ok
-            cb(null, 1);
-        });
+        if (validSenders.remoteAddress.indexOf(socket.remoteAddress) >= 0) {
+            if (validSenders.remotePort.indexOf(socket.remotePort) >= 0) {
+                if (validSenders.token.indexOf(socket.privateToken) >= 0) return true;
+            }
+        }
+
+        return false;
     }
 
 
     function server() {
-        var net = require("net");
-        var async = require("async");
-
+        var net             = require("net");
+        var async           = require("async");
+        
 
         // Start a TCP Server
         net.createServer(function (socket) {
 
-            //not sure how to handle the security checks and so on...
-
-
-
             // Handle incoming messages from clients.
             socket.on('data', function (data) {
-                broadcast(socket.name + "> " + data, socket);
+
+                //if valid sender
+                if (!senderIsValid(socket, data)) socket.write(0);
+
+                //if json valid format
+                else if (!validJSON(data)) socket.write(2);
+
+                //else write 1
+                else {
+                    //send to controller (sails)
+                    sails.controllers.Mail.save(data, function (err, _id) {
+                        sails.controllers.Mail.notifyReciever(data, _id);
+                    });
+
+                    //write response
+                    socket.write(1);
+                }
+
             });
 
             // on disconnect
             socket.on('end', function () { /* nothing */ });
 
         }).listen(4020);
-
-        async.series({
-            one: function (callback) {
-                setTimeout(function () {
-                    callback(null, 1);
-                }, 200);
-            },
-            two: function (callback) {
-                setTimeout(function () {
-                    callback(null, 2);
-                }, 100);
-            }
-        },
-        function (err, results) {
-            // results is now equal to: {one: 1, two: 2}
-        });
 
 
     } //end server()
@@ -107,7 +97,6 @@ module.exports = function (sails) {
 
             // start server
             server();
-
 
 
             return next();

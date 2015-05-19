@@ -25,8 +25,11 @@ var jsFilesToInject = [
   
   // Load sails.io before everything else
   'js/dependencies/sails.io.js',
+  'js/dependencies/mail/sails.socket.config.js',
 
   // Dependencies like jQuery, or Angular are brought in here
+  'js/dependencies/angular.1.4.0.min.js',
+  'js/dependencies/angular.1.4.0-route.min.js',
   'js/dependencies/**/*.js',
 
   // All of the rest of your client-side js files
